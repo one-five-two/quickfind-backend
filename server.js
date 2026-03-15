@@ -57,6 +57,23 @@ app.get('/vendors/:category', async (req, res) => {
         res.status(500).json({ error: "Database error" });
     }
 });
+// GET vendors by location
+app.get('/vendors/location/:location', async (req, res) => {
+    try {
+        const vendors = await Vendor.find({
+            location: req.params.location,
+            status: "approved"
+        });
+
+        if (vendors.length === 0) {
+            return res.status(404).json({ message: "No vendors found in this location" });
+        }
+
+        res.json(vendors);
+    } catch (error) {
+        res.status(500).json({ error: "Database error" });
+    }
+});
 
 // POST add vendor
 app.post('/vendors', async (req, res) => {
@@ -81,6 +98,20 @@ app.put('/vendors/:id', async (req, res) => {
         res.json({ message: "Vendor status updated successfully" });
     } catch (error) {
         res.status(500).json({ error: "Failed to update vendor" });
+    }
+});
+// DELETE a vendor by ID
+app.delete('/vendors/:id', async (req, res) => {
+    try {
+        const vendor = await Vendor.findByIdAndDelete(req.params.id);
+
+        if (!vendor) {
+            return res.status(404).json({ message: "Vendor not found" });
+        }
+
+        res.json({ message: "Vendor deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete vendor" });
     }
 });
 
